@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "388892286969",
+    "firebase_url": "https://wizardaxe-307fb-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "wizardaxe-307fb",
+    "storage_bucket": "wizardaxe-307fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388892286969:android:caccef331bd32f8877e728",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.MobileGameMax"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "388892286969-7p53er0uibebggvc3j0ghm0gjm4b2e6g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBS3ND6t16M4TVb-eQLbIDTm9mpcih7Zg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "388892286969-7p53er0uibebggvc3j0ghm0gjm4b2e6g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

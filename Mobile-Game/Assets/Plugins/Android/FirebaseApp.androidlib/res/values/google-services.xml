@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/firebase_database_url,@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_web_client_id">
+  <string name="firebase_database_url" translatable="false">https://wizardaxe-307fb-default-rtdb.europe-west1.firebasedatabase.app</string>
+  <string name="gcm_defaultSenderId" translatable="false">388892286969</string>
+  <string name="google_storage_bucket" translatable="false">wizardaxe-307fb.appspot.com</string>
+  <string name="project_id" translatable="false">wizardaxe-307fb</string>
+  <string name="google_api_key" translatable="false">AIzaSyBBS3ND6t16M4TVb-eQLbIDTm9mpcih7Zg</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBBS3ND6t16M4TVb-eQLbIDTm9mpcih7Zg</string>
+  <string name="google_app_id" translatable="false">1:388892286969:android:caccef331bd32f8877e728</string>
+  <string name="default_web_client_id" translatable="false">388892286969-7p53er0uibebggvc3j0ghm0gjm4b2e6g.apps.googleusercontent.com</string>
+</resources>

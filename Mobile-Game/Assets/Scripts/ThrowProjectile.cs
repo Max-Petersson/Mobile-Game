@@ -9,11 +9,13 @@ public class ThrowProjectile : MonoBehaviour
     public static event Action <float> ThrowFireBall;
     public static event Action <Vector3> RotateAim;
     public static event Action SpawnProjectile;
+    public static event Action <ProjectileInfo>SendToFireBase;
+
 
     Vector3 anchorPoint = Vector3.zero;
     Vector3 endTouch = Vector3.zero;
     float strenght = 0;
-
+    public static float rotz = 0f;
     void Start()
     {
     }
@@ -39,6 +41,9 @@ public class ThrowProjectile : MonoBehaviour
             strenght = Mathf.Clamp(strenght, .1f, 10f);
 
             ThrowFireBall?.Invoke(strenght);
+
+            ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
+            SendToFireBase?.Invoke(toFirebase);
         }
     }
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 public class Aim : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
-
     private void OnEnable()
     {
         ThrowProjectile.RotateAim += UpdateRotation;
@@ -22,8 +21,8 @@ public class Aim : MonoBehaviour
     private void UpdateRotation(Vector3 dir)
     {
         float rotz = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        ThrowProjectile.rotz = rotz;
         transform.rotation = Quaternion.Euler(0, 0, rotz);
-        
     }
     private void FireballSpawn()
     {
@@ -52,4 +51,5 @@ public class Aim : MonoBehaviour
         float distanceMultiplyer = GameHandler.CalculateDistance(strength);
         projectile.GetComponent<Rigidbody2D>().AddForce(child.transform.right *-1 * distanceMultiplyer);
     }
+   
 }

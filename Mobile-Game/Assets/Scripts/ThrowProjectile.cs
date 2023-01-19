@@ -11,16 +11,15 @@ public class ThrowProjectile : MonoBehaviour
     public static event Action SpawnProjectile;
     public static event Action <ProjectileInfo>SendToFireBase;
 
-
     Vector3 anchorPoint = Vector3.zero;
     Vector3 endTouch = Vector3.zero;
     float strenght = 0;
     public static float rotz = 0f;
     void Start()
     {
-    }
 
-    // Update is called once per frame
+    }
+  
     void Update()
     {
         if (Input.GetMouseButtonDown(0))

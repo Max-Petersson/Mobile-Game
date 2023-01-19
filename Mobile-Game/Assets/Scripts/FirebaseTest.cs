@@ -160,7 +160,6 @@ public class FirebaseTest : MonoBehaviour
             {
                 DataSnapshot snapshot = task.Result;
 
-               
                 string blo = snapshot.GetRawJsonValue();
 
                 string theObject = blo.Replace("Player1", "").Replace("Player2", "");
@@ -177,10 +176,8 @@ public class FirebaseTest : MonoBehaviour
                     {
                         keys.Add(blue);
                     }
-                       
-
                 }
-                int keeper = 1;
+
                 string spot1 = "";
                 string spot2 = "";
                 string path = "";
@@ -210,7 +207,6 @@ public class FirebaseTest : MonoBehaviour
                     }
                 }
                 
-
                 for (int i = 0; i < gameSessions.Count; i++)
                 {
                     

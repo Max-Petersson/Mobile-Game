@@ -32,7 +32,7 @@ public class FirebaseTest : MonoBehaviour
     FirebaseAuth auth;
     FirebaseApp app;
     DatabaseReference dbRef;
-    int testInt = 0;
+    bool gameWasFound = false;
     private string myPath = "";
     public static string mySpot = "";
     void Start()
@@ -110,90 +110,96 @@ public class FirebaseTest : MonoBehaviour
             {
                 Debug.LogError(task.Exception);
             }
-            else 
+
+            DataSnapshot snapshot = task.Result;
+           
+            string blo = snapshot.GetRawJsonValue();
+           
+            string theObject = blo.Replace("Player1", "").Replace("Player2", "");
+
+            char[] delimitercharacters = { ':', ',' };
+            string[] keysAndValues = theObject.Split(delimitercharacters);
+
+            List<string> keys = new List<string>();
+           
+           
+            foreach (string key in keysAndValues)
             {
-                DataSnapshot snapshot = task.Result;
+                string blue = key.Trim(new char[] { '{', '}', '"' }).Replace("angle", "").Replace("speed", "Taken");
                 
-                string blo = snapshot.GetRawJsonValue();
-
-                string theObject = blo.Replace("Player1", "").Replace("Player2", "");
-               
-                char[] delimitercharacters = {':', ','};
-                string[] keysAndValues = theObject.Split(delimitercharacters);
-
-                List<string> keys = new List<string>();
-
-                foreach (string key in keysAndValues)
+                float check = 0;
+                bool isFloat = float.TryParse(key.ToString(), out check);
+                if (blue.Length > 3 && isFloat == false)
                 {
-                    string blue = key.Trim(new char[] { '{', '}', '"' }).Replace("angle", "").Replace("speed", "Taken");
-                   
-                    float check = 0;
-                    bool isFloat = float.TryParse(key.ToString(), out check);
-                    if (blue.Length > 3 && isFloat == false)
-                    {
-                        Debug.Log(blue);
-                        keys.Add(blue);
-                    }
+                    Debug.Log(blue);
+                    keys.Add(blue);
                 }
-
-                string spot1 = "";
-                string spot2 = "";
-                string path = "";
-
-                Debug.Log(keys.Count);
-
-                List <GameSessions> gameSessions = new List <GameSessions>();
-                for(int i = 0; i < keys.Count; i++)
-                {
-                    if(i == 0 || i % 3 == 0)
-                    {
-                        path = keys[i];
-                        //its a key
-                    }
-                    else if(i == 1 || i % 3 == 1)
-                    {
-                        spot1 = keys[i];
-                        //spot 2
-                    }
-                    else if(i == 2 || i % 3 == 2)
-                    {
-                        spot2 = keys[i];
-                        GameSessions gamesesh = new(path, spot1, spot2);
-                        gameSessions.Add(gamesesh);
-                        
-                        //spot 3 try to join
-                    }
-                }
-                
-                for (int i = 0; i < gameSessions.Count; i++)
-                {
-                    if (gameSessions[i].spot1 == "none")
-                    {
-                        Debug.Log("Joining " + gameSessions[i].path + " as player 1");
-                        //i am player 1
-                        mySpot = "Player1";
-                        myPath = gameSessions[i].path;
-
-                        JoinGame(gameSessions[i].path,"Player1");//put function for joinin a game here
-                       
-                        ListenForPlayerJoin(gameSessions[i].path);
-                        return;
-                    }
-                    else if(gameSessions[i].spot2 == "none")
-                    {
-                        // i am player2
-                        Debug.Log("Joining " + gameSessions[i].path + " as player 2");
-                        mySpot = "Player2";
-                        myPath = gameSessions[i].path;
-                        JoinGame(gameSessions[i].path, "Player2"); 
-                        return;
-                    }
-                }
-                CreateGame();
-                TryJoinGame();
-              
             }
+
+            string spot1 = "";
+            string spot2 = "";
+            string path = "";
+
+            Debug.Log(keys.Count);
+
+            List<GameSessions> gameSessions = new List<GameSessions>();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                if (i == 0 || i % 3 == 0)
+                {
+                    path = keys[i];
+                    //its a key
+                }
+                else if (i == 1 || i % 3 == 1)
+                {
+                    spot1 = keys[i];
+                    //spot 2
+                }
+                else if (i == 2 || i % 3 == 2)
+                {
+                    spot2 = keys[i];
+                    GameSessions gamesesh = new(path, spot1, spot2);
+                    gameSessions.Add(gamesesh);
+
+                    //spot 3 try to join
+                }
+            }
+
+            for (int i = 0; i < gameSessions.Count; i++)
+            {
+                if (gameSessions[i].spot1 == "none")
+                {
+                    gameWasFound = true;
+                    Debug.Log("Joining " + gameSessions[i].path + " as player 1");
+                    //i am player 1
+                    mySpot = "Player1";
+                    myPath = gameSessions[i].path;
+
+                    JoinGame(gameSessions[i].path, "Player1");//put function for joinin a game here
+
+                    ListenForPlayerJoin(gameSessions[i].path);
+                    return;
+                }
+                else if (gameSessions[i].spot2 == "none")
+                {
+                    // i am player2
+                    gameWasFound = true;
+                    Debug.Log("Joining " + gameSessions[i].path + " as player 2");
+                    mySpot = "Player2";
+                    myPath = gameSessions[i].path;
+                    JoinGame(gameSessions[i].path, "Player2");
+                    return;
+                }
+            }
+            
+
         });
+        if(gameWasFound == false)
+        {
+            CreateGame();
+            //gameWasFound = true;
+        }
+       gameWasFound = false;
     }
     private void JoinGame(string path, string spot)
     { //change this
@@ -280,6 +286,7 @@ public class FirebaseTest : MonoBehaviour
         yield return new WaitForSeconds(1f);
         db.GetReference(GAMELOBBY).Child(myPath).RemoveValueAsync().ContinueWithOnMainThread(task => //remove this session from lobby
         {
+            db.GetReference(GAMELOBBY).Child(myPath).Child("Player2").ValueChanged -= StartGame;
             if (task.Exception != null)
             {
                 Debug.LogError(task.Exception);

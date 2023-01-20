@@ -15,34 +15,51 @@ public class ThrowProjectile : MonoBehaviour
     Vector3 endTouch = Vector3.zero;
     float strenght = 0;
     public static float rotz = 0f;
-    void Start()
-    {
+    public bool myTurn = true;
 
+    private void OnEnable()
+    {
+        FireBomb.Explode += SwitchTurn;
     }
-  
+    private void OnDisable()
+    {
+        FireBomb.Explode -= SwitchTurn;
+    }
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if(myTurn == true)
         {
-            anchorPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (Input.GetMouseButtonDown(0))
+            {
+                anchorPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            SpawnProjectile?.Invoke();
-        }
-        if (Input.GetMouseButton(0))
+                SpawnProjectile?.Invoke();
+            }
+            if (Input.GetMouseButton(0))
+            {
+                // visuals the bar of the throw mmeter going red
+                RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                endTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
+                strenght = Mathf.Clamp(strenght, .1f, 10f);
+
+                ThrowFireBall?.Invoke(strenght);
+
+                ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
+                SendToFireBase?.Invoke(toFirebase);
+            }
+        } 
+    }
+    private void SwitchTurn()
+    {
+        if (myTurn == false)
         {
-            // visuals the bar of the throw mmeter going red
-            RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            myTurn = true;
         }
-        if (Input.GetMouseButtonUp(0))
-        {
-            endTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
-            strenght = Mathf.Clamp(strenght, .1f, 10f);
-
-            ThrowFireBall?.Invoke(strenght);
-
-            ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
-            SendToFireBase?.Invoke(toFirebase);
-        }
+        else
+            myTurn = false;
     }
 }

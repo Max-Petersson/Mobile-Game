@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class FireBomb : MonoBehaviour
 {
     // Start is called before the first frame update
+    public static event Action Explode;
     void Start()
     {
         Destroy(gameObject, 10f);
@@ -17,9 +19,9 @@ public class FireBomb : MonoBehaviour
         }
         Destroy(gameObject);
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
+   
+    private void OnDestroy()
+    {//if not in tutorial
+        Explode?.Invoke();
     }
 }

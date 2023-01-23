@@ -26,16 +26,21 @@ public class Game
     
 }
 #endregion
-public class FirebaseTest : MonoBehaviour
+public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
 {
     private const string GAMELOBBY = "GameLobby";
     private const string GAMESESSION = "Gamesession";
+    private const string PLAYER1 = "Player1";
+    private const string PLAYER2 = "Player2";
     FirebaseDatabase db;
     FirebaseAuth auth;
     FirebaseApp app;
     bool gameWasFound = false;
-    private string myPath = "";
+    bool shouldListen = false;
+    private static string myPath = "";
     public static string mySpot = "";
+
+    public static event System.Action<ProjectileInfo> OnProjectile;
     void Start()
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
@@ -45,7 +50,6 @@ public class FirebaseTest : MonoBehaviour
 
             auth = FirebaseAuth.DefaultInstance;
             db = FirebaseDatabase.DefaultInstance;
-            app = FirebaseApp.Create();
             FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
         });
        
@@ -69,8 +73,6 @@ public class FirebaseTest : MonoBehaviour
     }
     private void SaveToFirebase(ProjectileInfo sendToFireBase) // sends projectileInfo on firebase which will be used to send the projectile on other players screen
     {
-        var userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-
         string jsonString = JsonUtility.ToJson(sendToFireBase);
         //puts the json data in the "users/userId" part of the database.
         db.GetReference(GAMESESSION).Child(myPath).Child(mySpot).SetRawJsonValueAsync(jsonString).ContinueWithOnMainThread(task =>
@@ -78,11 +80,10 @@ public class FirebaseTest : MonoBehaviour
             if (task.Exception != null)
                 Debug.Log(task.Exception);
         });
-       
     }
 
     #region SetUpGames
-    private void TryJoinGame() // This should be done when player presses start game
+    public void TryJoinGame() // This should be done when player presses start game
     {
         db?.GetReference(GAMELOBBY).GetValueAsync().ContinueWithOnMainThread(task => //here we have a way of going thorugh each game session just replace the 1 with an int
         {
@@ -92,33 +93,34 @@ public class FirebaseTest : MonoBehaviour
             }
 
             DataSnapshot snapshot = task.Result;
-            if (snapshot.Value == null)
+
+            if (snapshot.Value == null) // if there is no gamelobby up and running
             {
                 CreateGame();
                 TryJoinGame();
                 return;
             }
 
-            string blo = snapshot.GetRawJsonValue();
+            string bigJsonString = snapshot.GetRawJsonValue();
 
-            string theObject = blo.Replace("Player1", "").Replace("Player2", "");
+            string trimmedJsonString = bigJsonString.Replace("Player1", "").Replace("Player2", "");
 
             char[] delimitercharacters = { ':', ',' };
-            string[] keysAndValues = theObject.Split(delimitercharacters);
+            string[] gameSessionAndValues = trimmedJsonString.Split(delimitercharacters);
 
             List<string> keys = new List<string>();
 
 
-            foreach (string key in keysAndValues)
+            foreach (string key in gameSessionAndValues)
             {
-                string blue = key.Trim(new char[] { '{', '}', '"' }).Replace("angle", "").Replace("speed", "Taken");
+                string valueOrSession = key.Trim(new char[] { '{', '}', '"' }).Replace("angle", "").Replace("speed", "Taken");
 
                 float check = 0;
                 bool isFloat = float.TryParse(key.ToString(), out check);
-                if (blue.Length > 3 && isFloat == false)
+                if (valueOrSession.Length > 3 && isFloat == false)
                 {
-                    Debug.Log(blue);
-                    keys.Add(blue);
+                    Debug.Log(valueOrSession);
+                    keys.Add(valueOrSession);
                 }
             }
 
@@ -158,10 +160,10 @@ public class FirebaseTest : MonoBehaviour
                     gameWasFound = true;
                     Debug.Log("Joining " + gameSessions[i].path + " as player 1");
                     //i am player 1
-                    mySpot = "Player1";
+                    mySpot = PLAYER1;
                     myPath = gameSessions[i].path;
 
-                    JoinGame(gameSessions[i].path, "Player1");//put function for joinin a game here
+                    JoinGame(gameSessions[i].path, PLAYER1);//put function for joinin a game here
 
                     ListenForPlayerJoin(gameSessions[i].path);
                     return;
@@ -171,10 +173,11 @@ public class FirebaseTest : MonoBehaviour
                     // i am player2
                     gameWasFound = true;
                     Debug.Log("Joining " + gameSessions[i].path + " as player 2");
-                    mySpot = "Player2";
+                    mySpot = PLAYER2;
                     myPath = gameSessions[i].path;
-                    JoinGame(gameSessions[i].path, "Player2");
-                    ListenForPlayerThrow(myPath, "Player1");
+                    JoinGame(gameSessions[i].path, PLAYER2);
+
+                    ListenForPlayerThrow(myPath, PLAYER1);
                     return;
                 }
             }
@@ -211,18 +214,21 @@ public class FirebaseTest : MonoBehaviour
     }
     #endregion
 
-    private void UpdateGameState(object sender, ValueChangedEventArgs args) // this could be used to listen to player 1 actions
+    private void UpdateGameState(object sender, ValueChangedEventArgs args) //this gets called twice?
     {
         if(args.DatabaseError != null)
         {
             Debug.LogError(args.DatabaseError.Message);
             return;
         }
-        Debug.Log(args.Snapshot.GetRawJsonValue());
-        //ProjectileInfo info = JsonUtility.FromJson<ProjectileInfo>(args.Snapshot.GetRawJsonValue());
-        //Debug.Log(info.angle + " " + info.speed);
-        return ;
-        
+        Debug.Log("Im doin");
+        try {OnProjectile.Invoke(JsonUtility.FromJson<ProjectileInfo>(args.Snapshot.GetRawJsonValue()));}
+
+        catch
+        {
+            Debug.Log("Shouldnt listen");
+        }
+        return;
     }
    
     private void StartGame(object sender, ValueChangedEventArgs args)
@@ -239,7 +245,7 @@ public class FirebaseTest : MonoBehaviour
             Game session = new();
             string jsom = JsonUtility.ToJson(session);
 
-            db.GetReference(GAMELOBBY).Child(myPath).Child("Player2").ValueChanged -= StartGame;
+            db.GetReference(GAMELOBBY).Child(myPath).Child(PLAYER2).ValueChanged -= StartGame;
 
             db.RootReference.Child(GAMESESSION).Child(myPath).SetRawJsonValueAsync(jsom).ContinueWithOnMainThread(task => // create a new session under gamesession
             {
@@ -249,9 +255,9 @@ public class FirebaseTest : MonoBehaviour
                 }
             });
 
+            ListenForPlayerThrow(myPath, PLAYER2);
+
             StartCoroutine(DestroyLobby());
-           // Debug.Log("Game Will Start " + args.Snapshot.GetRawJsonValue());
-             //change this
         } 
     }
     private IEnumerator DestroyLobby()
@@ -272,8 +278,7 @@ public class FirebaseTest : MonoBehaviour
     }
     private void ListenForPlayerJoin(string path)
     {
-        //change this
-        db.GetReference(GAMELOBBY).Child(myPath).Child("Player2").ValueChanged += StartGame; //listen to see if a player joins
+        db.GetReference(GAMELOBBY).Child(myPath).Child(PLAYER2).ValueChanged += StartGame; //listen to see if a player joins
     }
     #endregion
 }

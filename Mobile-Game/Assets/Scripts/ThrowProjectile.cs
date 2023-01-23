@@ -29,31 +29,65 @@ public class ThrowProjectile : MonoBehaviour
     {
         if(myTurn == true)
         {
-            if (Input.GetMouseButtonDown(0))
+            if(Input.touchCount > 0)
             {
-                anchorPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Touch myTouch = Input.GetTouch(0);
+                if (myTouch.phase == TouchPhase.Began)
+                {
+                    anchorPoint = Camera.main.ScreenToWorldPoint(myTouch.position);
+                    SpawnProjectile.Invoke();
+                }
+                
+                RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(myTouch.position));
 
-                SpawnProjectile?.Invoke();
-            }
-            if (Input.GetMouseButton(0))
-            {
-                // visuals the bar of the throw mmeter going red
-                RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            }
-            if (Input.GetMouseButtonUp(0))
-            {
-                endTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
-                strenght = Mathf.Clamp(strenght, .1f, 10f);
+                if(myTouch.phase == TouchPhase.Ended)
+                {
+                    endTouch = Camera.main.ScreenToWorldPoint(myTouch.position);
+                    strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
+                    strenght = Mathf.Clamp(strenght, .1f, 10f);
 
-                ThrowFireBall?.Invoke(strenght);
-
-                ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
-                SendToFireBase?.Invoke(toFirebase);
+                    ThrowFireBall?.Invoke(strenght);
+                    myTurn = false; // so that you cant send another one.
+                    ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
+                    SendToFireBase?.Invoke(toFirebase);
+                }
+              
             }
+            //if (Input.GetTouch(1))
+            //{
+            //    anchorPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            //    SpawnProjectile?.Invoke();
+            //}
+            
+            //if (Input.GetMouseButton(0))
+            //{
+            //    // visuals the bar of the throw mmeter going red
+            //    RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            //}
+            //if (Input.GetMouseButtonUp(0))
+            //{
+            //    endTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //    strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
+            //    strenght = Mathf.Clamp(strenght, .1f, 10f);
+
+            //    ThrowFireBall?.Invoke(strenght);
+
+            //    ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
+            //    SendToFireBase?.Invoke(toFirebase);
+            //}
         } 
     }
     private void SwitchTurn()
+    {
+        //if (myTurn == false)
+        //{
+        //    myTurn = true;
+        //}
+        //else
+        //    myTurn = false;
+    }
+    public void DebugTurn()
     {
         if (myTurn == false)
         {

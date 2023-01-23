@@ -36,7 +36,6 @@ public class Aim : MonoBehaviour
     }
     private void ShootProjectile(float strength)
     {
-
         Vector2 pos = Vector2.zero;
         GameObject child = null;
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Aim : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
+    public static Vector3 referencePoint = Vector3.zero;
     private void OnEnable()
     {
         ThrowProjectile.RotateAim += UpdateRotation;
@@ -51,5 +52,4 @@ public class Aim : MonoBehaviour
         float distanceMultiplyer = GameHandler.CalculateDistance(strength);
         projectile.GetComponent<Rigidbody2D>().AddForce(child.transform.right *-1 * distanceMultiplyer);
     }
-   
 }

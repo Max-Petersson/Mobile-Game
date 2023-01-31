@@ -234,7 +234,7 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
             Debug.LogError(args.DatabaseError.Message);
             return;
         }
-        Debug.Log("Im doin");
+       
         try {OnProjectile.Invoke(JsonUtility.FromJson<ProjectileInfo>(args.Snapshot.GetRawJsonValue()));}
 
         catch
@@ -269,8 +269,9 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
             });
 
             ListenForPlayerThrow(myPath, PLAYER2);
-
+            
             StartCoroutine(DestroyLobby());
+
         } 
     }
     private IEnumerator DestroyLobby()

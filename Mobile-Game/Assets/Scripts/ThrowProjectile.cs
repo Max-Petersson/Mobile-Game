@@ -17,6 +17,10 @@ public class ThrowProjectile : MonoBehaviour
     public static float rotz = 0f;
     public bool myTurn = true;
 
+    private void Start()
+    {
+        Aim.referencePoint = transform.position;
+    }
     private void OnEnable()
     {
         FireBomb.Explode += SwitchTurn;
@@ -35,12 +39,12 @@ public class ThrowProjectile : MonoBehaviour
                 if (myTouch.phase == TouchPhase.Began)
                 {
                     anchorPoint = Camera.main.ScreenToWorldPoint(myTouch.position);
-                    SpawnProjectile.Invoke();
+                    SpawnProjectile?.Invoke();
                 }
                 
-                RotateAim?.Invoke(Camera.main.ScreenToWorldPoint(myTouch.position));
+                RotateAim?.Invoke(Camera.main.ScreenToWorldPoint((Vector3)myTouch.position) -gameObject.transform.position);
 
-                if(myTouch.phase == TouchPhase.Ended)
+                if (myTouch.phase == TouchPhase.Ended)
                 {
                     endTouch = Camera.main.ScreenToWorldPoint(myTouch.position);
                     strenght = Vector3.SqrMagnitude(endTouch - anchorPoint);
@@ -51,7 +55,6 @@ public class ThrowProjectile : MonoBehaviour
                     ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
                     SendToFireBase?.Invoke(toFirebase);
                 }
-              
             }
             //if (Input.GetTouch(1))
             //{
@@ -78,6 +81,7 @@ public class ThrowProjectile : MonoBehaviour
             //}
         } 
     }
+   
     private void SwitchTurn()
     {
         //if (myTurn == false)

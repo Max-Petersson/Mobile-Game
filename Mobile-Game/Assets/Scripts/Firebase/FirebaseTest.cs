@@ -28,19 +28,32 @@ public class Game
 #endregion
 public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
 {
+    public static FirebaseTest instance = null;
+    #region Constants
     private const string GAMELOBBY = "GameLobby";
     private const string GAMESESSION = "Gamesession";
     private const string PLAYER1 = "Player1";
     private const string PLAYER2 = "Player2";
+    #endregion
+    #region Variables
     FirebaseDatabase db;
     FirebaseAuth auth;
     FirebaseApp app;
     bool gameWasFound = false;
     bool shouldListen = false;
     private static string myPath = "";
-    public static string mySpot = "";
-
+    public string mySpot = "";
+    #endregion
     public static event System.Action<ProjectileInfo> OnProjectile;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if(instance != this)
+            Destroy(gameObject);
+    }
     void Start()
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>

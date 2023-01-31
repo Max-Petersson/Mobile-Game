@@ -89,11 +89,16 @@ public class ThrowProjectile : MonoBehaviour
     }
     public void DebugTurn()
     {
-        if (myTurn == false)
+        IEnumerator Switch()
         {
-            myTurn = true;
+            yield return new WaitForSeconds(2f);
+            if (myTurn == false)
+            {
+                myTurn = true;
+            }
+            else
+                myTurn = false;
         }
-        else
-            myTurn = false;
+        StartCoroutine(Switch());
     }
 }

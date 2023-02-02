@@ -16,6 +16,7 @@ public class ThrowProjectile : MonoBehaviour
     float strenght = 0;
     public static float rotz = 0f;
     public bool myTurn = true;
+    public bool hasThrown = false;
 
     private void Start()
     {
@@ -31,7 +32,7 @@ public class ThrowProjectile : MonoBehaviour
     }
     void Update()
     {
-        if(myTurn == true)
+        if(myTurn == true )
         {
             if(Input.touchCount > 0)
             {
@@ -52,6 +53,7 @@ public class ThrowProjectile : MonoBehaviour
 
                     ThrowFireBall?.Invoke(strenght);
                     myTurn = false; // so that you cant send another one.
+                    hasThrown = true;
                     ProjectileInfo toFirebase = new ProjectileInfo(rotz, strenght);
                     SendToFireBase?.Invoke(toFirebase);
                 }
@@ -84,12 +86,20 @@ public class ThrowProjectile : MonoBehaviour
    
     private void SwitchTurn()
     {
-        //if (myTurn == false)
-        //{
-        //    myTurn = true;
-        //}
-        //else
-        //    myTurn = false;
+        if(hasThrown == true)
+        {
+            hasThrown = false;
+        }
+        else
+        {
+            if (myTurn == false)
+            {
+                myTurn = true;
+            }
+            else
+                myTurn = false;
+        }
+       
     }
     public void DebugTurn()
     {

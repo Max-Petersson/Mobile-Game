@@ -42,7 +42,7 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
     bool gameWasFound = false;
     bool shouldListen = false;
     private static string myPath = "";
-    public string mySpot = "";
+    [HideInInspector] public static string mySpot = "";
     #endregion
     public static event System.Action<ProjectileInfo> OnProjectile;
     private void Awake()
@@ -80,9 +80,7 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
         if (Input.GetKeyDown(KeyCode.S))
         {
             TryJoinGame();
-            
         }
-
     }
     private void SaveToFirebase(ProjectileInfo sendToFireBase) // sends projectileInfo on firebase which will be used to send the projectile on other players screen
     {
@@ -122,7 +120,6 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
             string[] gameSessionAndValues = trimmedJsonString.Split(delimitercharacters);
 
             List<string> keys = new List<string>();
-
 
             foreach (string key in gameSessionAndValues)
             {
@@ -267,16 +264,13 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
                     Debug.LogError(task.Exception);
                 }
             });
-
+            DestroyLobby();
             ListenForPlayerThrow(myPath, PLAYER2);
-            
-            StartCoroutine(DestroyLobby());
 
         } 
     }
-    private IEnumerator DestroyLobby()
+    private void DestroyLobby()
     {
-        yield return new WaitForSeconds(1f);
         db.GetReference(GAMELOBBY).Child(myPath).RemoveValueAsync().ContinueWithOnMainThread(task => //remove this session from lobby
         {
             if (task.Exception != null)
@@ -289,6 +283,7 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
     private void ListenForPlayerThrow(string path, string spot)
     {
         db.GetReference(GAMESESSION).Child(path).Child(spot).ValueChanged += UpdateGameState;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Tutorial");
     }
     private void ListenForPlayerJoin(string path)
     {

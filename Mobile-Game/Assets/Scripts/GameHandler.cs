@@ -46,9 +46,9 @@ public class GameHandler : MonoBehaviour
             SetUp(characters[0], false);
         }
     }
-    private void SetUp(GameObject player, bool shouldBeActive)
+    private void SetUp(GameObject player, bool shouldBeActive) //enable the scripts nesseceary to play the game based on if you are player one or player 2
     {
-        if(shouldBeActive == true)
+        if(shouldBeActive == true) //setup your throw script on your character
         {
             player.GetComponent<ThrowProjectile>().enabled = shouldBeActive;
             foreach (Transform child in player.transform)
@@ -56,11 +56,10 @@ public class GameHandler : MonoBehaviour
                 if (child.CompareTag("RotationPoint"))
                 {
                     child.GetComponent<Aim>().enabled = shouldBeActive;
-                    Debug.Log(shouldBeActive);
                 }
             }
         }
-        else
+        else // set up the enemy throw script on the other character
         {
             foreach(Transform child in player.transform)
             {
@@ -71,7 +70,7 @@ public class GameHandler : MonoBehaviour
             }
         }
     }
-    public static float CalculateDistance(float strenght)
+    public static float CalculateDistance(float strenght) //calculates strenght
     {
         return strenght * 200f;
     }

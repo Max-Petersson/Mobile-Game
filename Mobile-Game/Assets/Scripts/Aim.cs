@@ -30,7 +30,8 @@ public class Aim : MonoBehaviour
         GameObject child = null;
         foreach(Transform t in transform)
         {
-            child = t.gameObject;
+            //if(child.gameObject.CompareTag("RotationPoint"))
+                child = t.gameObject;
         }
 
         child.gameObject.GetComponent<SpriteRenderer>().sprite = prefab.GetComponent<SpriteRenderer>().sprite;
@@ -42,7 +43,8 @@ public class Aim : MonoBehaviour
 
         foreach (Transform t in transform)
         {
-            child = t.gameObject;
+            //if(child.gameObject.CompareTag("RotationPoint"))
+                child = t.gameObject;
         }
         pos = child.transform.position;
 

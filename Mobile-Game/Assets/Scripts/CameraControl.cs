@@ -5,18 +5,21 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     [SerializeField] List <GameObject> players = new List<GameObject>();
-    float airTime = 0f;
+    
     GameObject firebomb = null;
     Camera mainCam;
-    float cameraSize;
+    float originalCamSize;
     Rigidbody2D body;
     Vector3 velocity = Vector3.zero;
     float smoothTime = 0.3f;
     float timer;
+    int playerToFollow = 0;
+    private bool shouldSwitch;
+
     private void Start()
     {
         mainCam = GetComponent<Camera>();
-        cameraSize = mainCam.orthographicSize;
+        originalCamSize = mainCam.orthographicSize;
     }
     // Update is called once per frame
     void Update()
@@ -33,41 +36,61 @@ public class CameraControl : MonoBehaviour
             
             if (mainCam.orthographicSize <= 30)
             {
-                mainCam.orthographicSize += 5f * Time.deltaTime;
+                mainCam.orthographicSize = Mathf.MoveTowards(mainCam.orthographicSize, 30f, 5 * Time.deltaTime);
                 
             }
                 
+        }
+        if(firebomb == null && shouldSwitch == true)
+        {
+            mainCam.orthographicSize = originalCamSize;
+            StartMoving();
+            shouldSwitch = false;
         }
     }
     public void SetFireBall(GameObject fireball)
     {
         firebomb = fireball;
+        shouldSwitch = true;
+        //maybe introduce a bool to start update methods
     }
-    public void StartMoving(bool moveToPlayer1)
+    public void StartMoving(bool moveToPlayer1 = true)
     {
-        if (moveToPlayer1)
+        if (playerToFollow == 0)
         {
-            if(FirebaseTest.mySpot == "Player1")
-            {
-                //move towards player2
-            }
-            else
-            {
-                //move towards player1
-            }
-            // lerp towards enemy
+            playerToFollow++;
         }
         else
         {
-            if(FirebaseTest.mySpot == "Player1")
-            {
-                //move towards player 2
-            }
-            else
-            {
-                //move towards player1;
-            }
-            //lerp towards 
+            playerToFollow--;
         }
+        gameObject.transform.position = players[playerToFollow].transform.position + new Vector3(0, 0, gameObject.transform.position.z);
+        
+       
+
+        //if (moveToPlayer1)
+        //{
+        //    if(FirebaseTest.mySpot == "Player1")
+        //    {
+        //        //move towards player2
+        //    }
+        //    else
+        //    {
+        //        //move towards player1
+        //    }
+        //    // lerp towards enemy
+        //}
+        //else
+        //{
+        //    if(FirebaseTest.mySpot == "Player1")
+        //    {
+        //        //move towards player 2
+        //    }
+        //    else
+        //    {
+        //        //move towards player1;
+        //    }
+        //    //lerp towards 
+        //}
     }
 }

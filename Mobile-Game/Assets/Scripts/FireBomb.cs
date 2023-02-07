@@ -7,6 +7,7 @@ public class FireBomb : MonoBehaviour
 {
     // Start is called before the first frame update
     public static event Action Explode;
+    public static event Action<string> PlayerHit;
    
     void Start()
     {
@@ -18,6 +19,7 @@ public class FireBomb : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            PlayerHit?.Invoke(collision.gameObject.name);
             //deal damage
         }
         Destroy(gameObject);
@@ -26,6 +28,7 @@ public class FireBomb : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            PlayerHit?.Invoke(collision.gameObject.name);
             //deal damage
         }
         Destroy(gameObject);

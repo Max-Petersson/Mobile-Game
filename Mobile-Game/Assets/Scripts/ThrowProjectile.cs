@@ -16,10 +16,12 @@ public class ThrowProjectile : MonoBehaviour
     float strenght = 0;
     public static float rotz = 0f;
     public bool myTurn = true;
+    public static bool gameOver = false;
 
     private void Start()
     {
         Aim.referencePoint = transform.position;
+        gameOver = false;
     }
     private void OnEnable()
     {
@@ -31,7 +33,7 @@ public class ThrowProjectile : MonoBehaviour
     }
     void Update()
     {
-        if(myTurn == true )
+        if(myTurn == true && gameOver == false)
         {
             if(Input.touchCount > 0)
             {

@@ -40,7 +40,6 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
     FirebaseAuth auth;
     FirebaseApp app;
     bool gameWasFound = false;
-    bool shouldListen = false;
     private static string myPath = "";
     [HideInInspector] public static string mySpot = "";
     #endregion
@@ -194,7 +193,7 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
         });
     }
     private void JoinGame(string path, string spot)
-    { //change this
+    { 
         db.GetReference(GAMELOBBY).Child(path).Child(spot).SetValueAsync("Taken").ContinueWithOnMainThread(task =>
         {
             if (task.Exception != null)
@@ -279,6 +278,16 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
             }
         });
     }
+    public void DestroyGameSession()
+    {
+        db.GetReference(GAMESESSION).Child(myPath).RemoveValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.Exception != null)
+            {
+                Debug.LogError(task.Exception);
+            }
+        });
+    }
     #region listeners 
     private void ListenForPlayerThrow(string path, string spot)
     {
@@ -288,6 +297,17 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
     private void ListenForPlayerJoin(string path)
     {
         db.GetReference(GAMELOBBY).Child(myPath).Child(PLAYER2).ValueChanged += StartGame; //listen to see if a player joins
+    }
+    public void StopListeningForThrows()
+    {
+        if(mySpot == PLAYER1)
+        {
+            db.GetReference(GAMESESSION).Child(myPath).Child(PLAYER2).ValueChanged -= UpdateGameState;
+        }
+        else
+        {
+            db.GetReference(GAMESESSION).Child(myPath).Child(PLAYER1).ValueChanged -= UpdateGameState;
+        }
     }
     #endregion
 }

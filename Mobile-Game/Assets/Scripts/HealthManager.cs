@@ -7,11 +7,14 @@ using UnityEngine.UI;
 public class HealthManager : MonoBehaviour
 {
     public List <GameObject> slider = new List<GameObject>();
+    public GameObject WinScreen;
+    public List<Sprite> characterIcons = new List<Sprite>();
 
     float health1 = 1f;
     float health2 = 1f;
 
     float damage = .25f;
+
     private void OnEnable()
     {
         FireBomb.PlayerHit += DealDamage;
@@ -35,15 +38,36 @@ public class HealthManager : MonoBehaviour
             //deal Damage
         }
 
-        Debug.Log($"Player 1 health; {health1} || Player2 health; {health2}");
-
         if (health1 <= 0)
         {
-            Debug.Log("Player2 wins");
+            ThrowProjectile.gameOver = true;
+            FirebaseTest.instance.StopListeningForThrows();
+            StartCoroutine(BackToMain());
+            //show winscreen
+            ShowWinScreen(1);
         }
         else if( health2 <= 0)
         {
-            Debug.Log("Player1 wins");
+            ThrowProjectile.gameOver = true;
+            FirebaseTest.instance.StopListeningForThrows();
+            //Show winscreen
+            ShowWinScreen(0);
+            StartCoroutine(BackToMain());
         }
+    }
+    IEnumerator BackToMain()
+    {
+        yield return new WaitForSeconds(3f);
+        if(FirebaseTest.mySpot == "Player1")
+        {
+            FirebaseTest.instance.DestroyGameSession();
+        }
+        FirebaseTest.mySpot = "";
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
+    private void ShowWinScreen(int whichCharacter)
+    {
+        WinScreen.GetComponent<Image>().enabled = true;
+        WinScreen.GetComponent<Image>().sprite = characterIcons[whichCharacter];
     }
 }

@@ -212,7 +212,6 @@ public class FirebaseTest : MonoBehaviour //maybe turn this into a singleton
         Game session = new();
 
         string jsom = JsonUtility.ToJson(session);
-        //change
         db?.GetReference(GAMELOBBY).Push().SetRawJsonValueAsync(jsom).ContinueWithOnMainThread(task =>
         {
             if (task.Exception != null)

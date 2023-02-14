@@ -33,7 +33,7 @@ public class ThrowProjectile : MonoBehaviour
     }
     void Update()
     {
-        if (myTurn == false && gameOver == true) return;
+        if (myTurn == false && gameOver == false) return;
         if (Input.touchCount <= 0) return;
 
 

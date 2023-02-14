@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 //using UnityEngine.UIElements;
 using UnityEngine.UI;
+using TMPro;
+
 
 public class HealthManager : MonoBehaviour
 {
     public List <GameObject> slider = new List<GameObject>();
     public GameObject WinScreen;
+    public GameObject WinText;
     public List<Sprite> characterIcons = new List<Sprite>();
 
     float health1 = 1f;
@@ -22,6 +25,13 @@ public class HealthManager : MonoBehaviour
     private void OnDisable()
     {
         FireBomb.PlayerHit -= DealDamage;
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            DealDamage("Player1");
+        }
     }
     private void DealDamage(string player)
     {
@@ -67,6 +77,18 @@ public class HealthManager : MonoBehaviour
     }
     private void ShowWinScreen(int whichCharacter)
     {
+        string winText;
+        if(whichCharacter == 0)
+        {
+            winText = "The Good Wizard Wins!";
+        }
+        else
+        {
+            winText = "The Evil Wizard Wins!";
+        }
+
+        WinText.GetComponent<TextMeshProUGUI>().text = winText;
+
         WinScreen.GetComponent<Image>().enabled = true;
         WinScreen.GetComponent<Image>().sprite = characterIcons[whichCharacter];
     }

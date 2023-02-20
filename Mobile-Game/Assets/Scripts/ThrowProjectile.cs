@@ -18,7 +18,7 @@ public class ThrowProjectile : MonoBehaviour
     public bool myTurn = true;
     public static bool gameOver = false;
 
-    private void Start()
+    private void Start() // Hej mich
     {
         Aim.referencePoint = transform.position;
         gameOver = false;
